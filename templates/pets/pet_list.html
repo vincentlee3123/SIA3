@@ -1,0 +1,155 @@
+{% extends "pets/base.html" %}
+{% block title %}Pet Registry{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="page-head">
+        <div>
+            <h1><i class="bi bi-clipboard2-pulse text-primary me-2"></i>Pet Registry</h1>
+            <p class="page-subtitle">Manage records, health details and checkups for every pet.</p>
+        </div>
+        <a href="{% url 'pet_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Add New Pet
+        </a>
+    </div>
+
+    <div class="pms-card mb-3">
+        <div class="pms-card-header">
+            <i class="bi bi-funnel"></i>Search &amp; Filter
+        </div>
+        <form method="get" class="p-3">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label class="form-label" for="{{ filter_form.q.id_for_label }}">Search</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        {{ filter_form.q }}
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label" for="{{ filter_form.species.id_for_label }}">Species</label>
+                    {{ filter_form.species }}
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label" for="{{ filter_form.gender.id_for_label }}">Gender</label>
+                    {{ filter_form.gender }}
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label" for="{{ filter_form.status.id_for_label }}">Status</label>
+                    {{ filter_form.status }}
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label" for="{{ filter_form.sort.id_for_label }}">Sort by</label>
+                    {{ filter_form.sort }}
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label" for="{{ filter_form.dir.id_for_label }}">Direction</label>
+                    {{ filter_form.dir }}
+                </div>
+                <div class="col-md-10 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i>Apply Filters
+                    </button>
+                    <a href="{% url 'pet_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="pms-card overflow-hidden">
+        <div class="table-responsive">
+            <table class="table pms-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Pet</th>
+                        <th>Species</th>
+                        <th>Breed</th>
+                        <th class="text-center">Age</th>
+                        <th>Gender</th>
+                        <th>Owner</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pet in pets %}
+                    <tr>
+                        <td>
+                            <div class="pet-name-cell">
+                                {% if pet.photo %}
+                                <img src="{{ pet.photo.url }}" alt="{{ pet.pet_name }}" class="pet-avatar">
+                                {% else %}
+                                <div class="pet-avatar"><i class="bi bi-heart"></i></div>
+                                {% endif %}
+                                <div>
+                                    <a href="{% url 'pet_detail' pet.pk %}" class="fw-semibold text-decoration-none text-dark">{{ pet.pet_name }}</a>
+                                    <div class="pet-id">{{ pet.pet_id }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="text-muted">{{ pet.species }}</span></td>
+                        <td>{{ pet.breed|default:"—" }}</td>
+                        <td class="text-center">{{ pet.age }}</td>
+                        <td>{{ pet.gender }}</td>
+                        <td>{{ pet.owner_name }}</td>
+                        <td><span class="pill pill-{{ pet.status }}">{{ pet.get_status_display }}</span></td>
+                        <td class="text-end text-nowrap">
+                            <a href="{% url 'pet_detail' pet.pk %}" class="btn btn-sm btn-outline-info" title="View"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'pet_update' pet.pk %}" class="btn btn-sm btn-outline-warning" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'pet_delete' pet.pk %}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox empty-icon"></i>
+                                {% if query %}No pets match "{{ query }}".{% else %}No pets registered yet. Add your first pet to get started.{% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Pet list pages" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left"></i></span></li>
+            {% endif %}
+
+            {% for num in paginator.page_range %}
+                {% if num == page_obj.number %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right"></i></span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

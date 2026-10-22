@@ -1,0 +1,107 @@
+{% extends "pets/base.html" %}
+{% block title %}{{ pet.pet_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <a href="{% url 'pet_list' %}" class="text-decoration-none text-muted small d-inline-flex align-items-center mb-3">
+        <i class="bi bi-arrow-left me-1"></i>Back to Pet Registry
+    </a>
+
+    <div class="pms-card overflow-hidden mb-4">
+        <div class="p-4 p-md-5" style="background: linear-gradient(120deg, #0f766e, #0891b2);">
+            <div class="d-flex flex-column flex-md-row align-items-md-center gap-4 text-white">
+                {% if pet.photo %}
+                <img src="{{ pet.photo.url }}" alt="{{ pet.pet_name }}" class="pet-avatar pet-avatar-lg bg-white">
+                {% else %}
+                <div class="pet-avatar pet-avatar-lg bg-white"><i class="bi bi-heart-pulse"></i></div>
+                {% endif %}
+                <div class="flex-grow-1">
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                        <h1 class="mb-0 fw-bold">{{ pet.pet_name }}</h1>
+                        <span class="pill pill-{{ pet.status }}">{{ pet.get_status_display }}</span>
+                    </div>
+                    <p class="mb-1 opacity-75">Pet ID: {{ pet.pet_id }}</p>
+                    <p class="mb-0 opacity-75"><i class="bi bi-person me-1"></i>Owner: {{ pet.owner_name }}</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'pet_update' pet.pk %}" class="btn btn-light">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                    </a>
+                    <a href="{% url 'pet_delete' pet.pk %}" class="btn btn-outline-light">
+                        <i class="bi bi-trash me-1"></i>Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-0">
+            <div class="col-6 col-md-3 border-end border-bottom p-3 p-md-4">
+                <div class="text-muted small"><i class="bi bi-tag me-1"></i>Species</div>
+                <div class="fw-semibold fs-5">{{ pet.species }}</div>
+            </div>
+            <div class="col-6 col-md-3 border-end border-bottom p-3 p-md-4">
+                <div class="text-muted small"><i class="bi bi-bookmark me-1"></i>Breed</div>
+                <div class="fw-semibold fs-5">{{ pet.breed|default:"—" }}</div>
+            </div>
+            <div class="col-6 col-md-3 border-end border-bottom p-3 p-md-4">
+                <div class="text-muted small"><i class="bi bi-palette me-1"></i>Color</div>
+                <div class="fw-semibold fs-5">{{ pet.color|default:"—" }}</div>
+            </div>
+            <div class="col-6 col-md-3 border-bottom p-3 p-md-4">
+                <div class="text-muted small"><i class="bi bi-gender-ambiguous me-1"></i>Gender</div>
+                <div class="fw-semibold fs-5">{{ pet.gender }}</div>
+            </div>
+            <div class="col-6 col-md-3 border-end p-3 p-md-4">
+                <div class="text-muted small"><i class="bi bi-calendar-heart me-1"></i>Age</div>
+                <div class="fw-semibold fs-5">{{ pet.age }} yr{{ pet.age|pluralize }}</div>
+            </div>
+            <div class="col-6 col-md-3 border-end p-3 p-md-4">
+                <div class="text-muted small"><i class="bi bi-speedometer me-1"></i>Weight</div>
+                <div class="fw-semibold fs-5">{% if pet.weight %}{{ pet.weight }} kg{% else %}—{% endif %}</div>
+            </div>
+            <div class="col-6 col-md-3 border-end p-3 p-md-4">
+                <div class="text-muted small"><i class="bi bi-calendar-check me-1"></i>Next Checkup</div>
+                <div class="fw-semibold fs-5">{{ pet.next_checkup|date:"M d, Y"|default:"—" }}</div>
+            </div>
+            <div class="col-6 col-md-3 p-3 p-md-4">
+                <div class="text-muted small"><i class="bi bi-clock-history me-1"></i>Registered</div>
+                <div class="fw-semibold fs-5">{{ pet.date_registered|date:"M d, Y" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="pms-card h-100">
+                <div class="pms-card-header"><i class="bi bi-clipboard2-heart"></i>Health Details</div>
+                <div class="p-4">
+                    {% if pet.health_details %}
+                    <p class="mb-0" style="white-space: pre-line;">{{ pet.health_details }}</p>
+                    {% else %}
+                    <p class="text-muted mb-0">No health notes recorded for this pet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="pms-card h-100">
+                <div class="pms-card-header"><i class="bi bi-person-badge"></i>Record Info</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Owner</span>
+                        <span class="fw-semibold">{{ pet.owner_name }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Added by</span>
+                        <span class="fw-semibold">{{ pet.created_by|default:"—" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Status</span>
+                        <span class="pill pill-{{ pet.status }}">{{ pet.get_status_display }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

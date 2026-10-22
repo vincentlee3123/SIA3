@@ -1,0 +1,176 @@
+{% extends "pets/base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="page-head">
+        <div>
+            <h1><i class="bi bi-speedometer2 text-primary me-2"></i>Dashboard</h1>
+            <p class="page-subtitle">{{ today|date:"l, F j, Y" }} &middot; Here is your clinic at a glance.</p>
+        </div>
+        <a href="{% url 'pet_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Add New Pet
+        </a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="stat-tile tile-teal h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Total Pets</div>
+                        <div class="stat-value">{{ total_pets }}</div>
+                    </div>
+                    <i class="bi bi-heart-pulse stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-tile tile-blue h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Active</div>
+                        <div class="stat-value">{{ active_pets }}</div>
+                    </div>
+                    <i class="bi bi-heart stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-tile tile-amber h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Adopted</div>
+                        <div class="stat-value">{{ adopted_pets }}</div>
+                    </div>
+                    <i class="bi bi-house-heart stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-tile tile-rose h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Upcoming Checkups</div>
+                        <div class="stat-value">{{ upcoming_count }}</div>
+                    </div>
+                    <i class="bi bi-calendar-check stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="pms-card h-100">
+                <div class="pms-card-header"><i class="bi bi-pie-chart"></i>Species Distribution</div>
+                <div class="p-4">
+                    {% for row in species_counts %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="fw-semibold">{{ row.species }}</span>
+                            <span class="text-muted">{{ row.total }} of {{ total_pets }}</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" role="progressbar"
+                                 style="width: {% widthratio row.total total_pets 100 %}%"
+                                 aria-valuenow="{{ row.total }}" aria-valuemin="0" aria-valuemax="{{ total_pets }}"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted mb-0">No pets registered yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="pms-card h-100">
+                <div class="pms-card-header"><i class="bi bi-gender-ambiguous"></i>Gender Breakdown</div>
+                <div class="p-4">
+                    {% for row in gender_counts %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="fw-semibold">{{ row.gender }}</span>
+                            <span class="text-muted">{{ row.total }} of {{ total_pets }}</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar {% if row.gender == 'Male' %}bg-primary{% else %}bg-danger{% endif %}" role="progressbar"
+                                 style="width: {% widthratio row.total total_pets 100 %}%"
+                                 aria-valuenow="{{ row.total }}" aria-valuemin="0" aria-valuemax="{{ total_pets }}"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted mb-0">No pets registered yet.</p>
+                    {% endfor %}
+
+                    <hr>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for row in status_counts %}
+                        <span class="pill pill-{{ row.status }}">{{ row.status|title }}: {{ row.total }}</span>
+                        {% empty %}
+                        <span class="text-muted small">No status data yet.</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="pms-card h-100">
+                <div class="pms-card-header"><i class="bi bi-calendar-week"></i>Upcoming Checkups</div>
+                <ul class="list-group list-group-flush">
+                    {% for pet in upcoming_checkups %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="pet-avatar"><i class="bi bi-calendar-heart"></i></div>
+                            <div>
+                                <a href="{% url 'pet_detail' pet.pk %}" class="fw-semibold text-decoration-none text-dark">{{ pet.pet_name }}</a>
+                                <div class="small text-muted">{{ pet.pet_id }} &middot; {{ pet.species }}</div>
+                            </div>
+                        </div>
+                        <span class="pill pill-active">{{ pet.next_checkup|date:"M d" }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item px-4">
+                        <div class="empty-state py-4">
+                            <i class="bi bi-calendar-x empty-icon"></i>No upcoming checkups.
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="pms-card h-100">
+                <div class="pms-card-header"><i class="bi bi-clock-history"></i>Recently Registered</div>
+                <ul class="list-group list-group-flush">
+                    {% for pet in recent_pets %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-4">
+                        <div class="d-flex align-items-center gap-3">
+                            {% if pet.photo %}
+                            <img src="{{ pet.photo.url }}" alt="{{ pet.pet_name }}" class="pet-avatar">
+                            {% else %}
+                            <div class="pet-avatar"><i class="bi bi-heart"></i></div>
+                            {% endif %}
+                            <div>
+                                <a href="{% url 'pet_detail' pet.pk %}" class="fw-semibold text-decoration-none text-dark">{{ pet.pet_name }}</a>
+                                <div class="small text-muted">{{ pet.owner_name }}</div>
+                            </div>
+                        </div>
+                        <span class="small text-muted">{{ pet.date_registered|date:"M d, Y" }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item px-4">
+                        <div class="empty-state py-4">
+                            <i class="bi bi-inbox empty-icon"></i>No pets registered yet.
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

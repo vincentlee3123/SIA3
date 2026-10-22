@@ -1,0 +1,152 @@
+{% extends "pets/base.html" %}
+{% block title %}{% if pet %}Edit Pet{% else %}Add New Pet{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="page-head">
+        <div>
+            <h1>
+                <i class="bi bi-{% if pet %}pencil-square{% else %}plus-circle{% endif %} text-primary me-2"></i>
+                {% if pet %}Edit Pet{% else %}Register a New Pet{% endif %}
+            </h1>
+            <p class="page-subtitle">
+                {% if pet %}Update the details for {{ pet.pet_name }}.{% else %}Fill in the details below to add a pet to the registry.{% endif %}
+            </p>
+        </div>
+        <a href="{% url 'pet_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+    </div>
+
+    {% if form.errors %}
+    <div class="alert alert-danger shadow-sm">
+        <i class="bi bi-exclamation-triangle me-1"></i>Please correct the errors highlighted below.
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="pms-card mb-3">
+            <div class="pms-card-header"><i class="bi bi-identification"></i>Identity</div>
+            <div class="p-3 p-md-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.pet_id.id_for_label }}">Pet ID <span class="text-danger">*</span></label>
+                        {{ form.pet_id }}
+                        {{ form.pet_id.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.pet_name.id_for_label }}">Pet Name <span class="text-danger">*</span></label>
+                        {{ form.pet_name }}
+                        {{ form.pet_name.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="{{ form.species.id_for_label }}">Species <span class="text-danger">*</span></label>
+                        {{ form.species }}
+                        {{ form.species.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="{{ form.breed.id_for_label }}">Breed</label>
+                        {{ form.breed }}
+                        {{ form.breed.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="{{ form.color.id_for_label }}">Color</label>
+                        {{ form.color }}
+                        {{ form.color.errors }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pms-card mb-3">
+            <div class="pms-card-header"><i class="bi bi-clipboard2-pulse"></i>Appearance &amp; Vitals</div>
+            <div class="p-3 p-md-4">
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <label class="form-label" for="{{ form.age.id_for_label }}">Age (years) <span class="text-danger">*</span></label>
+                        {{ form.age }}
+                        {{ form.age.errors }}
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label" for="{{ form.weight.id_for_label }}">Weight (kg)</label>
+                        {{ form.weight }}
+                        {{ form.weight.errors }}
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label" for="{{ form.gender.id_for_label }}">Gender <span class="text-danger">*</span></label>
+                        {{ form.gender }}
+                        {{ form.gender.errors }}
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label" for="{{ form.status.id_for_label }}">Status <span class="text-danger">*</span></label>
+                        {{ form.status }}
+                        {{ form.status.errors }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pms-card mb-3">
+            <div class="pms-card-header"><i class="bi bi-heart-pulse"></i>Ownership &amp; Health</div>
+            <div class="p-3 p-md-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.owner_name.id_for_label }}">Owner Name <span class="text-danger">*</span></label>
+                        {{ form.owner_name }}
+                        {{ form.owner_name.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.next_checkup.id_for_label }}">Next Checkup</label>
+                        {{ form.next_checkup }}
+                        {{ form.next_checkup.errors }}
+                    </div>
+                    <div class="col-md-7">
+                        <label class="form-label" for="{{ form.health_details.id_for_label }}">Health Details</label>
+                        {{ form.health_details }}
+                        {{ form.health_details.errors }}
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label" for="{{ form.photo.id_for_label }}">Photo</label>
+                        {{ form.photo }}
+                        {{ form.photo.errors }}
+                        <div class="mt-2">
+                            {% if pet.photo %}
+                            <img id="photo-preview" src="{{ pet.photo.url }}" alt="{{ pet.pet_name }}" class="rounded-3 border" style="width: 100%; max-width: 180px; height: 130px; object-fit: cover;">
+                            {% else %}
+                            <img id="photo-preview" src="" alt="Photo preview" class="rounded-3 border d-none" style="width: 100%; max-width: 180px; height: 130px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-check2-circle me-1"></i>{% if pet %}Save Changes{% else %}Register Pet{% endif %}
+            </button>
+            <a href="{% url 'pet_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        var input = document.getElementById("{{ form.photo.id_for_label }}");
+        var preview = document.getElementById("photo-preview");
+        if (input && preview) {
+            input.addEventListener("change", function () {
+                var file = input.files && input.files[0];
+                if (!file) { return; }
+                preview.src = URL.createObjectURL(file);
+                preview.classList.remove("d-none");
+            });
+        }
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "pets/base.html" %}
+{% block title %}Delete Pet{% endblock %}
+
+{% block content %}
+<div class="container my-4" style="max-width: 560px;">
+    <div class="pms-card overflow-hidden">
+        <div class="p-4 text-white" style="background: linear-gradient(120deg, #b91c1c, #ef4444);">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-exclamation-triangle fs-2"></i>
+                <div>
+                    <h1 class="h3 mb-0">Delete Pet</h1>
+                    <p class="mb-0 opacity-75">This action cannot be undone.</p>
+                </div>
+            </div>
+        </div>
+        <div class="p-4">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                {% if pet.photo %}
+                <img src="{{ pet.photo.url }}" alt="{{ pet.pet_name }}" class="pet-avatar pet-avatar-lg">
+                {% else %}
+                <div class="pet-avatar pet-avatar-lg"><i class="bi bi-heart"></i></div>
+                {% endif %}
+                <div>
+                    <h2 class="h4 mb-1">{{ pet.pet_name }}</h2>
+                    <p class="text-muted mb-0">Pet ID: {{ pet.pet_id }} &middot; {{ pet.species }}</p>
+                </div>
+            </div>
+
+            <p class="mb-4">
+                Are you sure you want to permanently remove <strong>{{ pet.pet_name }}</strong> from the registry?
+                All of its details, including health records and photo, will be deleted.
+            </p>
+
+            <form method="post" class="d-flex flex-wrap gap-2">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger px-4">
+                    <i class="bi bi-trash me-1"></i>Yes, Delete Pet
+                </button>
+                <a href="{% url 'pet_detail' pet.pk %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
